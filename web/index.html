@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVOCREATURES</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+
+  <header class="site-header">
+    <a class="brand" href="#top">EVOCREATURES</a>
+    <nav class="site-nav">
+      <a href="#about">About</a>
+      <a href="#pipeline">How it works</a>
+      <a href="#tech">Tech</a>
+      <a href="#demo">Demo</a>
+      <a href="#">Source &#8599;</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- HERO SECTION -->
+    <section id="about" class="hero">
+      <div class="hero-content">
+        <div class="pill">
+          <span class="pill-text">KARL SIMS &bull; INSPIRED</span>
+        </div>
+        <h1>Creatures that learn to move themselves</h1>
+        <p class="hero-copy">
+          A genetic algorithm evolves articulated bodies and motion controllers in physics simulation. Watch them figure out locomotion from scratch.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#demo">View demo replays</a>
+          <a class="button secondary" href="#pipeline">Read how it works</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-image-placeholder">
+          <div class="creature-abstract">
+            <div class="box b1"></div>
+            <div class="box b2"></div>
+            <div class="box b3"></div>
+            <div class="box b4"></div>
+          </div>
+          <p>morphology evolves over generations</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SYSTEM OVERVIEW -->
+    <section id="pipeline" class="section">
+      <p class="eyebrow">SYSTEM OVERVIEW</p>
+      <h2>How evolution works</h2>
+      <p class="section-desc">Six stages run offline in Python. The browser only plays back the results.</p>
+      
+      <div class="pipeline-grid">
+        <article class="pipeline-card">
+          <div class="step-number">01</div>
+          <h3>Genome</h3>
+          <p>Morphology + controller params</p>
+        </article>
+        <div class="arrow">&rarr;</div>
+        <article class="pipeline-card">
+          <div class="step-number">02</div>
+          <h3>Build body</h3>
+          <p>Assemble creature in PyBullet</p>
+        </article>
+        <div class="arrow">&rarr;</div>
+        <article class="pipeline-card">
+          <div class="step-number">03</div>
+          <h3>Simulate</h3>
+          <p>Physics + torque control</p>
+        </article>
+        <div class="arrow">&rarr;</div>
+        <article class="pipeline-card">
+          <div class="step-number">04</div>
+          <h3>Fitness</h3>
+          <p>Distance traveled</p>
+        </article>
+        <div class="arrow">&rarr;</div>
+        <article class="pipeline-card">
+          <div class="step-number">05</div>
+          <h3>Mutate</h3>
+          <p>Genetic algorithm loop</p>
+        </article>
+        <div class="arrow">&rarr;</div>
+        <article class="pipeline-card">
+          <div class="step-number">06</div>
+          <h3>Replay</h3>
+          <p>JSON &rarr; Three.js browser</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section id="tech" class="section">
+      <p class="eyebrow">STACK</p>
+      <h2>Technologies used</h2>
+      <div class="tech-grid">
+        <article class="tech-card">
+          <span class="tag tag-green">BACKEND</span>
+          <h3>Python 3.11</h3>
+          <p>Evolution loop, genome, fitness</p>
+        </article>
+        <article class="tech-card">
+          <span class="tag tag-blue">SIMULATION</span>
+          <h3>PyBullet</h3>
+          <p>Rigid body physics DIRECT mode</p>
+        </article>
+        <article class="tech-card">
+          <span class="tag tag-green">BACKEND</span>
+          <h3>NumPy</h3>
+          <p>Transforms, genome arrays</p>
+        </article>
+        <article class="tech-card">
+          <span class="tag tag-purple">FRONTEND</span>
+          <h3>Three.js</h3>
+          <p>WebGL replay renders</p>
+        </article>
+        <article class="tech-card">
+          <span class="tag tag-purple">FRONTEND</span>
+          <h3>Vanilla JS</h3>
+          <p>No framework, static host</p>
+        </article>
+        <article class="tech-card">
+          <span class="tag tag-green">ALGORITHM</span>
+          <h3>Genetic algo</h3>
+          <p>Mutation-only, population-based</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- DEMO SECTION -->
+    <section id="demo" class="section demo-section">
+      <p class="eyebrow">DEMO</p>
+      <h2>Replay viewer</h2>
+      <p class="section-desc" style="max-width: 600px;">
+        Watch exported replays from the evolution run. Select a generation to compare locomotion strategies.
+      </p>
+      
+      <div class="demo-select-container">
+        <select id="generation-select" class="dropdown">
+          <option value="phase1_creature.json">Generation 0 (Phase 1 Baseline)</option>
+          <option value="phase1_creature.json">Generation 10</option>
+          <option value="phase1_creature.json">Generation 20</option>
+          <option value="phase1_creature.json">Generation 30</option>
+          <option value="phase1_creature.json">Generation 40</option>
+          <option value="phase1_creature.json">Generation 50</option>
+          <option value="phase1_creature.json">Generation 60</option>
+          <option value="phase1_creature.json">Generation 70</option>
+          <option value="phase1_creature.json">Generation 80</option>
+          <option value="phase1_creature.json">Generation 90</option>
+          <option value="phase1_creature.json">Generation 100</option>
+        </select>
+      </div>
+
+      <div class="player-container">
+        <div class="player-header">
+          <div class="mac-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <div class="player-title">phase1_creature.json — generation 0</div>
+        </div>
+        
+        <div class="replay-stage" id="viewer-container">
+          <div class="placeholder-overlay" id="loading-overlay">
+            <p>Loading 3D Viewer...</p>
+          </div>
+        </div>
+        
+        <div class="player-controls">
+          <div class="control-btns">
+            <button id="btn-reset" class="icon-btn">&#9198;</button>
+            <button id="btn-play-pause" class="icon-btn play-btn">&#9654; Play</button>
+          </div>
+          <div class="scrubber-wrapper">
+            <input type="range" id="playback-scrubber" min="0" max="100" value="0">
+          </div>
+          <div class="time-display">
+            <span id="demo-frame-count">0</span> frames
+          </div>
+          <div class="speed-control">
+            <button class="icon-btn speed-btn">1x</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Generations evolved</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">0.0m</div>
+          <div class="stat-label">Best fitness score</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">1</div>
+          <div class="stat-label">Population size</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">2</div>
+          <div class="stat-label">Body parts (max)</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-left">Built with Python &bull; PyBullet &bull; Three.js</div>
+    <div class="footer-right">
+      <a href="#">GitHub &#8599;</a>
+      <a href="#">Technical log &#8599;</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="Viewer3D.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
