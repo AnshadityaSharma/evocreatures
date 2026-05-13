@@ -1,118 +1,139 @@
 import pybullet as p
 
-
-TORSO_SIZE = [0.7, 0.4, 0.3]
-LEG_SIZE = [0.16, 0.16, 0.7]
-
-
-class SimpleCreature:
-    def __init__(self, body_id, client_id, hinge_joint_index=0):
+class DynamicCreature:
+    def __init__(self, body_id, client_id, genome):
         self.body_id = body_id
         self.client_id = client_id
-        self.hinge_joint_index = hinge_joint_index
-        self.parts = {
-            "torso": {"shape": "box", "size": TORSO_SIZE},
-            "leg": {"shape": "box", "size": LEG_SIZE},
-        }
+        self.genome = genome
+        # parts dict: "part_0" is torso, "part_1" is leg1, etc.
+        self.parts = {}
+        for i, gene in enumerate(genome.morphology):
+            self.parts[f"part_{i}"] = {"shape": "box", "size": gene.size}
 
-    def apply_torque(self, torque):
-        p.setJointMotorControl2(
-            bodyUniqueId=self.body_id,
-            jointIndex=self.hinge_joint_index,
-            controlMode=p.TORQUE_CONTROL,
-            force=torque,
-            physicsClientId=self.client_id,
-        )
+    def apply_torques(self, torques):
+        for i, torque in enumerate(torques):
+            p.setJointMotorControl2(
+                bodyUniqueId=self.body_id,
+                jointIndex=i,
+                controlMode=p.TORQUE_CONTROL,
+                force=torque,
+                physicsClientId=self.client_id,
+            )
 
-    def joint_angle(self):
-        return p.getJointState(self.body_id, self.hinge_joint_index, physicsClientId=self.client_id)[0]
+    def joint_angles(self):
+        angles = []
+        num_joints = p.getNumJoints(self.body_id, physicsClientId=self.client_id)
+        for i in range(num_joints):
+            angles.append(p.getJointState(self.body_id, i, physicsClientId=self.client_id)[0])
+        return angles
 
     def torso_position(self):
         position, _ = p.getBasePositionAndOrientation(self.body_id, physicsClientId=self.client_id)
         return position
 
     def body_transforms(self):
-        torso_position, torso_orientation = p.getBasePositionAndOrientation(
-            self.body_id,
-            physicsClientId=self.client_id,
+        transforms = {}
+        torso_pos, torso_ori = p.getBasePositionAndOrientation(
+            self.body_id, physicsClientId=self.client_id
         )
-        leg_state = p.getLinkState(
-            self.body_id,
-            self.hinge_joint_index,
-            computeForwardKinematics=True,
-            physicsClientId=self.client_id,
-        )
-
-        return {
-            "torso": {
-                "position": list(torso_position),
-                "orientation": list(torso_orientation),
-            },
-            "leg": {
-                "position": list(leg_state[4]),
-                "orientation": list(leg_state[5]),
-            },
+        transforms["part_0"] = {
+            "position": list(torso_pos),
+            "orientation": list(torso_ori),
         }
+        
+        num_joints = p.getNumJoints(self.body_id, physicsClientId=self.client_id)
+        for i in range(num_joints):
+            state = p.getLinkState(
+                self.body_id, i, computeForwardKinematics=True, physicsClientId=self.client_id
+            )
+            transforms[f"part_{i+1}"] = {
+                "position": list(state[4]),
+                "orientation": list(state[5]),
+            }
+        return transforms
 
+def build_creature_from_genome(genome, client_id):
+    if not genome.morphology:
+        return None
 
-def create_simple_creature(client_id):
-    torso_collision = p.createCollisionShape(
-        p.GEOM_BOX,
-        halfExtents=[value / 2.0 for value in TORSO_SIZE],
-        physicsClientId=client_id,
+    root_gene = genome.morphology[0]
+    root_col = p.createCollisionShape(
+        p.GEOM_BOX, halfExtents=[v / 2.0 for v in root_gene.size], physicsClientId=client_id
     )
-    torso_visual = p.createVisualShape(
-        p.GEOM_BOX,
-        halfExtents=[value / 2.0 for value in TORSO_SIZE],
-        rgbaColor=[0.25, 0.45, 0.9, 1.0],
-        physicsClientId=client_id,
+    root_vis = p.createVisualShape(
+        p.GEOM_BOX, halfExtents=[v / 2.0 for v in root_gene.size], rgbaColor=[0.25, 0.45, 0.9, 1.0], physicsClientId=client_id
     )
-    leg_collision = p.createCollisionShape(
-        p.GEOM_BOX,
-        halfExtents=[value / 2.0 for value in LEG_SIZE],
-        physicsClientId=client_id,
-    )
-    leg_visual = p.createVisualShape(
-        p.GEOM_BOX,
-        halfExtents=[value / 2.0 for value in LEG_SIZE],
-        rgbaColor=[0.9, 0.55, 0.2, 1.0],
-        physicsClientId=client_id,
-    )
+
+    link_masses = []
+    link_cols = []
+    link_vis = []
+    link_positions = []
+    link_orientations = []
+    link_inertial_pos = []
+    link_inertial_ori = []
+    link_parents = []
+    link_joint_types = []
+    link_joint_axes = []
+
+    for i in range(1, len(genome.morphology)):
+        gene = genome.morphology[i]
+        
+        col = p.createCollisionShape(
+            p.GEOM_BOX, halfExtents=[v / 2.0 for v in gene.size], physicsClientId=client_id
+        )
+        vis = p.createVisualShape(
+            p.GEOM_BOX, halfExtents=[v / 2.0 for v in gene.size], rgbaColor=[0.9, 0.55, 0.2, 1.0], physicsClientId=client_id
+        )
+        
+        link_masses.append(0.35) # Simple uniform mass for now
+        link_cols.append(col)
+        link_vis.append(vis)
+        link_positions.append(gene.attach_offset)
+        link_orientations.append([0, 0, 0, 1])
+        link_inertial_pos.append([0, 0, 0])
+        link_inertial_ori.append([0, 0, 0, 1])
+        
+        link_parents.append(gene.parent_index)
+        link_joint_types.append(p.JOINT_REVOLUTE)
+        link_joint_axes.append(gene.joint_axis)
 
     body_id = p.createMultiBody(
         baseMass=1.0,
-        baseCollisionShapeIndex=torso_collision,
-        baseVisualShapeIndex=torso_visual,
-        basePosition=[0, 0, 0.8],
-        linkMasses=[0.35],
-        linkCollisionShapeIndices=[leg_collision],
-        linkVisualShapeIndices=[leg_visual],
-        linkPositions=[[0.28, 0, -0.15]],
-        linkOrientations=[[0, 0, 0, 1]],
-        linkInertialFramePositions=[[0, 0, 0]],
-        linkInertialFrameOrientations=[[0, 0, 0, 1]],
-        linkParentIndices=[0],
-        linkJointTypes=[p.JOINT_REVOLUTE],
-        linkJointAxis=[[0, 1, 0]],
+        baseCollisionShapeIndex=root_col,
+        baseVisualShapeIndex=root_vis,
+        basePosition=[0, 0, 1.0],
+        linkMasses=link_masses,
+        linkCollisionShapeIndices=link_cols,
+        linkVisualShapeIndices=link_vis,
+        linkPositions=link_positions,
+        linkOrientations=link_orientations,
+        linkInertialFramePositions=link_inertial_pos,
+        linkInertialFrameOrientations=link_inertial_ori,
+        linkParentIndices=link_parents,
+        linkJointTypes=link_joint_types,
+        linkJointAxis=link_joint_axes,
         physicsClientId=client_id,
     )
 
-    # Add joint limits and stabilization
-    p.changeDynamics(
-        body_id, 0, 
-        jointLowerLimit=-1.5, 
-        jointUpperLimit=1.5,
-        jointDamping=2.0,
-        lateralFriction=1.0, 
-        physicsClientId=client_id
-    )
+    # Base dynamics
     p.changeDynamics(body_id, -1, lateralFriction=0.8, physicsClientId=client_id)
-    p.setJointMotorControl2(
-        bodyUniqueId=body_id,
-        jointIndex=0,
-        controlMode=p.VELOCITY_CONTROL,
-        force=0,
-        physicsClientId=client_id,
-    )
+    
+    # Joint limits and stabilization for each link
+    for i in range(len(genome.morphology) - 1):
+        p.changeDynamics(
+            body_id, i, 
+            jointLowerLimit=-1.5, 
+            jointUpperLimit=1.5,
+            jointDamping=2.0,
+            lateralFriction=1.0, 
+            physicsClientId=client_id
+        )
+        p.setJointMotorControl2(
+            bodyUniqueId=body_id,
+            jointIndex=i,
+            controlMode=p.VELOCITY_CONTROL,
+            force=0,
+            physicsClientId=client_id,
+        )
 
-    return SimpleCreature(body_id, client_id)
+    return DynamicCreature(body_id, client_id, genome)

@@ -1,26 +1,33 @@
-const replayPath = "replays/phase1_creature.json";
-
+const generationSelectEl = document.querySelector("#generation-select");
 const demoFrameCountEl = document.querySelector("#demo-frame-count");
 let viewer3d = null;
 
-function initializeApp(replay) {
-  // Update text stats
-  demoFrameCountEl.textContent = replay.frames.length.toLocaleString();
-
-  // Initialize the true 3D Viewer
-  viewer3d = new Viewer3D('viewer-container');
-  viewer3d.loadReplay(replay);
+function loadReplay(replayFilename) {
+  const replayPath = `replays/${replayFilename}`;
+  fetch(`${replayPath}?t=${Date.now()}`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Unable to load replay: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((replay) => {
+      demoFrameCountEl.textContent = replay.frames.length.toLocaleString();
+      if (!viewer3d) {
+        viewer3d = new Viewer3D('viewer-container');
+      }
+      viewer3d.loadReplay(replay);
+    })
+    .catch((error) => {
+      console.error(error);
+      demoFrameCountEl.textContent = "Error loading";
+    });
 }
 
-fetch(`${replayPath}?t=${Date.now()}`)
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error(`Unable to load replay: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then(initializeApp)
-  .catch((error) => {
-    console.error(error);
-    demoFrameCountEl.textContent = "Error";
-  });
+// Initial load
+loadReplay(generationSelectEl.value);
+
+// Handle dropdown changes
+generationSelectEl.addEventListener("change", (e) => {
+  loadReplay(e.target.value);
+});

@@ -77,7 +77,7 @@ class Viewer3D {
         const [w, h, d] = partData.size;
         const geometry = new THREE.BoxGeometry(w, h, d);
         const material = new THREE.MeshStandardMaterial({ 
-          color: partName === 'torso' ? 0x3b82f6 : 0x8b5cf6,
+          color: partName === 'part_0' ? 0x3b82f6 : 0x8b5cf6,
           roughness: 0.3,
           metalness: 0.2
         });
@@ -150,8 +150,8 @@ class Viewer3D {
     }
     
     // Follow the torso with camera target
-    if (this.meshes['torso']) {
-        this.controls.target.copy(this.meshes['torso'].position);
+    if (this.meshes['part_0']) {
+        this.controls.target.copy(this.meshes['part_0'].position);
     }
   }
 

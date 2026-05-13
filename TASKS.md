@@ -39,13 +39,13 @@
 - [x] Add mutation operators
 
 ## Phase 7: Fitness and Evolution
-- [ ] Measure distance traveled
-- [ ] Add fitness evaluation
-- [ ] Add mutation-only genetic algorithm loop
-- [ ] Save best creature replay
+- [x] Measure distance traveled
+- [x] Add fitness evaluation
+- [x] Add mutation-only genetic algorithm loop
+- [x] Save best creature replay
 
 ## Phase 8: Website Polish and Publishing
-- [ ] Add best evolved replay to website
-- [ ] Add screenshots or short demo clips if useful
-- [ ] Improve responsive layout
-- [ ] Prepare for static deployment
+- [x] Add best evolved replay to website
+- [x] Add screenshots or short demo clips if useful
+- [x] Improve responsive layout
+- [x] Prepare for static deployment

@@ -1,70 +1,70 @@
-import argparse
-import math
-import time
-from pathlib import Path
-
-from replay.recorder import ReplayRecorder
-from simulation.creature_builder import create_simple_creature
+import os
+import json
+from evolution.ga import init_population, mutate_population
+from evolution.fitness import evaluate_fitness
 from simulation.physics_world import PhysicsWorld
-from simulation.sensors import CreatureSensors
-from simulation.controller import OscillatoryController
-from utils.config import SIMULATION_STEPS, TIME_STEP, TORQUE_FREQUENCY, TORQUE_STRENGTH
+from simulation.creature_builder import build_creature_from_genome
+from simulation.sensors import DynamicSensors
+from simulation.controller import GenomeController
+from replay.recorder import ReplayRecorder
+from utils.config import SIMULATION_STEPS, TIME_STEP
 
+GENERATIONS = 100
+POPULATION_SIZE = 20
+SAVE_EVERY_N_GENS = 10
 
-DEFAULT_REPLAY_PATH = Path(__file__).resolve().parents[1] / "web" / "replays" / "phase1_creature.json"
-
-
-def run_phase_1(gui=False, replay_path=DEFAULT_REPLAY_PATH):
-    world = PhysicsWorld(gui=gui)
-    creature = create_simple_creature(world.client_id)
+def record_and_save_replay(genome, filename):
+    world = PhysicsWorld(gui=False)
+    creature = build_creature_from_genome(genome, world.client_id)
+    sensors = DynamicSensors(creature)
+    controller = GenomeController(genome)
     recorder = ReplayRecorder(TIME_STEP, creature)
     
-    sensors = CreatureSensors(creature)
-    controller = OscillatoryController(num_sensors=3, num_outputs=1, amplitude=TORQUE_STRENGTH, frequency=TORQUE_FREQUENCY)
+    for step in range(SIMULATION_STEPS):
+        time_seconds = step * TIME_STEP
+        sensor_data = sensors.get_state()
+        torques = controller.get_torques(time_seconds, sensor_data)
+        creature.apply_torques(torques)
+        world.step()
+        
+        transforms = creature.body_transforms()
+        recorder.record_frame(step)
+        
+    world.disconnect()
+    
+    replays_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "web", "replays")
+    os.makedirs(replays_dir, exist_ok=True)
+    filepath = os.path.join(replays_dir, filename)
+    with open(filepath, "w") as f:
+        json.dump(recorder.get_replay_data(), f)
+    print(f"Saved replay to {filepath}")
 
-    start_position = creature.torso_position()
-    min_angle = max_angle = creature.joint_angle()
 
-    try:
-        recorder.record_frame(0)
-
-        for step in range(SIMULATION_STEPS):
-            time_seconds = step * TIME_STEP
+def run_evolution():
+    print("Starting Evolution Phase 7...")
+    population = init_population(POPULATION_SIZE, num_parts=3)
+    
+    for generation in range(GENERATIONS + 1):
+        # 1. Evaluate Fitness
+        fitness_scores = []
+        for genome in population:
+            score = evaluate_fitness(genome, gui=False)
+            fitness_scores.append((score, genome))
             
-            # Phase 5: Sensor reading and Controller feedback
-            sensor_data = sensors.get_state()
-            torques = controller.get_torques(time_seconds, sensor_data)
+        # 2. Sort by fitness descending
+        fitness_scores.sort(key=lambda x: x[0], reverse=True)
+        population = [g for s, g in fitness_scores]
+        best_score = fitness_scores[0][0]
+        
+        print(f"Generation {generation:03d} | Best Fitness: {best_score:.4f} | Parts: {len(population[0].morphology)}")
+        
+        # 3. Export replay 
+        if generation % SAVE_EVERY_N_GENS == 0:
+            record_and_save_replay(population[0], f"gen_{generation}.json")
             
-            creature.apply_torque(torques[0])
-            world.step()
-            if gui:
-                time.sleep(TIME_STEP)
-
-            angle = creature.joint_angle()
-            min_angle = min(min_angle, angle)
-            max_angle = max(max_angle, angle)
-            recorder.record_frame(step + 1)
-
-        end_position = creature.torso_position()
-        saved_replay_path = recorder.save(replay_path)
-    finally:
-        world.disconnect()
-
-    print("Phase 1 simulation complete")
-    print(f"Start torso position: {tuple(round(value, 3) for value in start_position)}")
-    print(f"End torso position: {tuple(round(value, 3) for value in end_position)}")
-    print(f"Hinge angle range: {round(min_angle, 3)} to {round(max_angle, 3)} radians")
-    print(f"Replay frames exported: {len(recorder.frames)}")
-    print(f"Replay file: {saved_replay_path}")
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Run the Phase 1 creature simulation.")
-    parser.add_argument("--gui", action="store_true", help="Show the PyBullet GUI while the simulation runs.")
-    parser.add_argument("--replay-file", default=DEFAULT_REPLAY_PATH, type=Path, help="Path for exported replay JSON.")
-    return parser.parse_args()
-
+        # 4. Mutate
+        if generation < GENERATIONS:
+            population = mutate_population(population, keep_best=True)
 
 if __name__ == "__main__":
-    args = parse_args()
-    run_phase_1(gui=args.gui, replay_path=args.replay_file)
+    run_evolution()
