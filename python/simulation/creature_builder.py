@@ -20,8 +20,8 @@ class DynamicCreature:
                     jointIndex=i,
                     controlMode=p.POSITION_CONTROL,
                     targetPosition=angle,
-                    force=12.0,
-                    maxVelocity=5.0,
+                    force=25.0,         # Stronger muscles
+                    maxVelocity=12.0,   # Faster swings
                     physicsClientId=self.client_id,
                 )
 

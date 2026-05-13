@@ -56,9 +56,9 @@ def record_and_save_replay(genome, filename, generation, fitness):
 
 
 def run_evolution():
-    print(f"Starting evolution: {GENERATIONS} generations, {POPULATION_SIZE} creatures each")
-    print(f"Simulation: {SIMULATION_STEPS} steps ({SIMULATION_STEPS * TIME_STEP:.1f}s) per creature")
-    print("-" * 60)
+    print(f"Starting evolution: {GENERATIONS} generations, {POPULATION_SIZE} creatures each", flush=True)
+    print(f"Simulation: {SIMULATION_STEPS} steps ({SIMULATION_STEPS * TIME_STEP:.1f}s) per creature", flush=True)
+    print("-" * 60, flush=True)
     
     population = init_population(POPULATION_SIZE, num_parts=5)  # torso + 4 legs
     
@@ -74,7 +74,7 @@ def run_evolution():
         avg_score = sum(s for s, g in fitness_scores) / len(fitness_scores)
         
         parts_count = len(population[0].morphology)
-        print(f"Gen {generation:03d} | Best: {best_score:7.3f} | Avg: {avg_score:7.3f} | Parts: {parts_count}")
+        print(f"Gen {generation:03d} | Best: {best_score:7.3f} | Avg: {avg_score:7.3f} | Parts: {parts_count}", flush=True)
         
         if generation % SAVE_EVERY_N_GENS == 0:
             record_and_save_replay(population[0], f"gen_{generation}.json", generation, best_score)
@@ -82,8 +82,8 @@ def run_evolution():
         if generation < GENERATIONS:
             population = mutate_population(population, keep_best=True)
     
-    print("-" * 60)
-    print("Evolution complete!")
+    print("-" * 60, flush=True)
+    print("Evolution complete!", flush=True)
 
 if __name__ == "__main__":
     run_evolution()
