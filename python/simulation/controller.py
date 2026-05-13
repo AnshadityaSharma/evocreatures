@@ -16,8 +16,9 @@ class GenomeController:
             for j in range(min(len(sensor_data), len(brain_gene.sensor_weights))):
                 sensor_feedback += sensor_data[j] * brain_gene.sensor_weights[j]
             
-            torque = brain_gene.amplitude * (oscillation + sensor_feedback * 0.5)
-            torque = max(min(torque, 15.0), -15.0)
+            torque = brain_gene.amplitude * (oscillation + sensor_feedback * 0.3)
+            # Hard clamp to prevent explosive forces
+            torque = max(min(torque, 8.0), -8.0)
             torques.append(torque)
             
         return torques

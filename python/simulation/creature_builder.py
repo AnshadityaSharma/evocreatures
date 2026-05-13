@@ -85,7 +85,7 @@ def build_creature_from_genome(genome, client_id):
             p.GEOM_BOX, halfExtents=[v / 2.0 for v in gene.size], rgbaColor=[0.9, 0.55, 0.2, 1.0], physicsClientId=client_id
         )
         
-        link_masses.append(0.35) # Simple uniform mass for now
+        link_masses.append(0.35)
         link_cols.append(col)
         link_vis.append(vis)
         link_positions.append(gene.attach_offset)
@@ -98,10 +98,10 @@ def build_creature_from_genome(genome, client_id):
         link_joint_axes.append(gene.joint_axis)
 
     body_id = p.createMultiBody(
-        baseMass=1.0,
+        baseMass=1.5,
         baseCollisionShapeIndex=root_col,
         baseVisualShapeIndex=root_vis,
-        basePosition=[0, 0, 1.0],
+        basePosition=[0, 0, 0.8],
         linkMasses=link_masses,
         linkCollisionShapeIndices=link_cols,
         linkVisualShapeIndices=link_vis,
@@ -115,19 +115,21 @@ def build_creature_from_genome(genome, client_id):
         physicsClientId=client_id,
     )
 
-    # Base dynamics
-    p.changeDynamics(body_id, -1, lateralFriction=0.8, physicsClientId=client_id)
+    # Base dynamics — high friction to grip ground
+    p.changeDynamics(body_id, -1, lateralFriction=1.2, restitution=0.1, physicsClientId=client_id)
     
-    # Joint limits and stabilization for each link
+    # Joint limits and heavy damping for each link
     for i in range(len(genome.morphology) - 1):
         p.changeDynamics(
             body_id, i, 
-            jointLowerLimit=-1.5, 
-            jointUpperLimit=1.5,
-            jointDamping=2.0,
-            lateralFriction=1.0, 
+            jointLowerLimit=-1.2, 
+            jointUpperLimit=1.2,
+            jointDamping=3.0,
+            lateralFriction=1.2,
+            restitution=0.1,
             physicsClientId=client_id
         )
+        # Disable default motor so torque control works
         p.setJointMotorControl2(
             bodyUniqueId=body_id,
             jointIndex=i,

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 
@@ -141,12 +141,12 @@
       <p class="eyebrow">DEMO</p>
       <h2>Replay viewer</h2>
       <p class="section-desc" style="max-width: 600px;">
-        Watch exported replays from the evolution run. Select a generation to compare locomotion strategies.
+        Watch exported replays from the evolution run. Select a generation to compare how locomotion strategies improve over time.
       </p>
       
       <div class="demo-select-container">
         <select id="generation-select" class="dropdown">
-          <option value="gen_0.json">Generation 0</option>
+          <option value="gen_0.json">Generation 0 &mdash; random starting point</option>
           <option value="gen_10.json">Generation 10</option>
           <option value="gen_20.json">Generation 20</option>
           <option value="gen_30.json">Generation 30</option>
@@ -156,7 +156,7 @@
           <option value="gen_70.json">Generation 70</option>
           <option value="gen_80.json">Generation 80</option>
           <option value="gen_90.json">Generation 90</option>
-          <option value="gen_100.json" selected>Generation 100</option>
+          <option value="gen_100.json" selected>Generation 100 &mdash; best evolved</option>
         </select>
       </div>
 
@@ -167,7 +167,7 @@
             <span class="dot yellow"></span>
             <span class="dot green"></span>
           </div>
-          <div class="player-title">phase1_creature.json — generation 0</div>
+          <div class="player-title">Loading...</div>
         </div>
         
         <div class="replay-stage" id="viewer-container">
@@ -178,7 +178,7 @@
         
         <div class="player-controls">
           <div class="control-btns">
-            <button id="btn-reset" class="icon-btn">&#9198;</button>
+            <button id="btn-reset" class="icon-btn" title="Reset to frame 0">&#9198;</button>
             <button id="btn-play-pause" class="icon-btn play-btn">&#9654; Play</button>
           </div>
           <div class="scrubber-wrapper">
@@ -188,27 +188,27 @@
             <span id="demo-frame-count">0</span> frames
           </div>
           <div class="speed-control">
-            <button class="icon-btn speed-btn">1x</button>
+            <button id="btn-speed" class="icon-btn speed-btn" title="Toggle playback speed">0.25x</button>
           </div>
         </div>
       </div>
 
       <div class="stats-grid">
         <div class="stat-box">
-          <div class="stat-value">0</div>
-          <div class="stat-label">Generations evolved</div>
+          <div class="stat-value">&mdash;</div>
+          <div class="stat-label">Generation</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">0.0m</div>
-          <div class="stat-label">Best fitness score</div>
+          <div class="stat-value">&mdash;</div>
+          <div class="stat-label">Fitness (distance)</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">1</div>
+          <div class="stat-value">&mdash;</div>
           <div class="stat-label">Population size</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">2</div>
-          <div class="stat-label">Body parts (max)</div>
+          <div class="stat-value">&mdash;</div>
+          <div class="stat-label">Body parts</div>
         </div>
       </div>
     </section>
