@@ -1,24 +1,33 @@
 import math
 
 class GenomeController:
+    """Converts brain genes into joint angle targets (not torques).
+    
+    Each joint oscillates between -limit and +limit at the gene's frequency.
+    This produces a rhythmic swinging motion like real limbs."""
+    
     def __init__(self, genome):
         self.genome = genome
 
-    def get_torques(self, time_seconds, sensor_data):
-        torques = []
-        # Torso (index 0) has a brain gene but no joint, so skip index 0
+    def get_target_angles(self, time_seconds, sensor_data):
+        """Return a list of target joint angles (one per joint)."""
+        targets = []
+        # Torso (index 0) has no joint, brain genes 1..N map to joints 0..N-1
         for i in range(1, len(self.genome.brain)):
-            brain_gene = self.genome.brain[i]
+            brain = self.genome.brain[i]
             
-            oscillation = math.sin(2.0 * math.pi * brain_gene.frequency * time_seconds + brain_gene.phase)
+            # Base oscillation: swing between -amplitude and +amplitude
+            swing = math.sin(2.0 * math.pi * brain.frequency * time_seconds + brain.phase)
             
-            sensor_feedback = 0.0
-            for j in range(min(len(sensor_data), len(brain_gene.sensor_weights))):
-                sensor_feedback += sensor_data[j] * brain_gene.sensor_weights[j]
+            # Modulate with sensor feedback (small influence)
+            feedback = 0.0
+            for j in range(min(len(sensor_data), len(brain.sensor_weights))):
+                feedback += sensor_data[j] * brain.sensor_weights[j]
             
-            torque = brain_gene.amplitude * (oscillation + sensor_feedback * 0.3)
-            # Hard clamp to prevent explosive forces
-            torque = max(min(torque, 8.0), -8.0)
-            torques.append(torque)
+            # Target angle in radians, clamped to joint limits
+            target = brain.amplitude * (swing + feedback * 0.2)
+            target = max(-0.9, min(0.9, target))
             
-        return torques
+            targets.append(target)
+            
+        return targets

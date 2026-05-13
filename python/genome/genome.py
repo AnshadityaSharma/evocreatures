@@ -3,30 +3,25 @@ import copy
 
 class MorphologyGene:
     def __init__(self, size=None, parent_index=None, attach_offset=None, joint_axis=None):
-        # Size of the box part (width, height, depth)
-        self.size = size or [random.uniform(0.15, 0.6) for _ in range(3)]
-        # Index of the parent part to attach to. -1 means this is the root (torso).
+        self.size = size or [random.uniform(0.12, 0.5) for _ in range(3)]
         self.parent_index = parent_index if parent_index is not None else 0
-        # Where to attach on the parent relative to parent's center
-        self.attach_offset = attach_offset or [random.uniform(-0.4, 0.4) for _ in range(3)]
-        # The axis of the hinge joint — prefer Y-axis (side-to-side swing) for locomotion
+        # Attachment offset relative to parent center
+        self.attach_offset = attach_offset or [random.uniform(-0.3, 0.3) for _ in range(3)]
+        # Hinge joint axis
         axis_choices = [[1,0,0], [0,1,0], [0,0,1]]
         self.joint_axis = joint_axis or random.choice(axis_choices)
 
     def mutate(self):
-        # Mutate size (conservative)
         if random.random() < 0.3:
             idx = random.randint(0, 2)
-            self.size[idx] += random.uniform(-0.1, 0.1)
-            self.size[idx] = max(0.1, min(0.8, self.size[idx]))
+            self.size[idx] += random.uniform(-0.08, 0.08)
+            self.size[idx] = max(0.08, min(0.6, self.size[idx]))
             
-        # Mutate attach offset
         if random.random() < 0.3:
             idx = random.randint(0, 2)
-            self.attach_offset[idx] += random.uniform(-0.15, 0.15)
-            self.attach_offset[idx] = max(-0.6, min(0.6, self.attach_offset[idx]))
+            self.attach_offset[idx] += random.uniform(-0.1, 0.1)
+            self.attach_offset[idx] = max(-0.5, min(0.5, self.attach_offset[idx]))
             
-        # Mutate joint axis (rare)
         if random.random() < 0.05:
             axis_choices = [[1,0,0], [0,1,0], [0,0,1]]
             self.joint_axis = random.choice(axis_choices)
@@ -34,29 +29,28 @@ class MorphologyGene:
 
 class BrainGene:
     def __init__(self, amplitude=None, frequency=None, phase=None, sensor_weights=None):
-        # Capped amplitude so creatures can't launch themselves
-        self.amplitude = amplitude if amplitude is not None else random.uniform(0.5, 4.0)
-        self.frequency = frequency if frequency is not None else random.uniform(0.3, 3.0)
+        # Amplitude is now a target angle range, not a force
+        self.amplitude = amplitude if amplitude is not None else random.uniform(0.2, 0.8)
+        self.frequency = frequency if frequency is not None else random.uniform(0.3, 2.5)
         self.phase = phase if phase is not None else random.uniform(-3.14, 3.14)
-        # Weights for sensor feedback
-        self.sensor_weights = sensor_weights or [random.uniform(-0.5, 0.5) for _ in range(3)]
+        self.sensor_weights = sensor_weights or [random.uniform(-0.3, 0.3) for _ in range(3)]
 
     def mutate(self):
         if random.random() < 0.3:
-            self.amplitude += random.uniform(-0.8, 0.8)
-            self.amplitude = max(0.2, min(6.0, self.amplitude))
+            self.amplitude += random.uniform(-0.15, 0.15)
+            self.amplitude = max(0.1, min(0.9, self.amplitude))
             
         if random.random() < 0.3:
-            self.frequency += random.uniform(-0.5, 0.5)
-            self.frequency = max(0.1, min(4.0, self.frequency))
+            self.frequency += random.uniform(-0.4, 0.4)
+            self.frequency = max(0.1, min(3.0, self.frequency))
             
         if random.random() < 0.3:
             self.phase += random.uniform(-0.5, 0.5)
             
-        if random.random() < 0.3:
+        if random.random() < 0.2:
             idx = random.randint(0, 2)
-            self.sensor_weights[idx] += random.uniform(-0.3, 0.3)
-            self.sensor_weights[idx] = max(-1.0, min(1.0, self.sensor_weights[idx]))
+            self.sensor_weights[idx] += random.uniform(-0.2, 0.2)
+            self.sensor_weights[idx] = max(-0.6, min(0.6, self.sensor_weights[idx]))
 
 
 class Genome:
@@ -65,43 +59,76 @@ class Genome:
         self.brain = []
         
         if num_initial_parts is not None:
-            # The root node (torso) — give it a reasonable size
-            self.morphology.append(MorphologyGene(
-                size=[random.uniform(0.3, 0.6), random.uniform(0.2, 0.35), random.uniform(0.15, 0.25)],
-                parent_index=-1
-            ))
-            self.brain.append(BrainGene())
+            self._build_initial_creature(num_initial_parts)
+    
+    def _build_initial_creature(self, num_parts):
+        """Create a creature with a torso and legs attached below it."""
+        # Torso: wide, flat body
+        torso_w = random.uniform(0.3, 0.5)
+        torso_h = random.uniform(0.1, 0.2)
+        torso_d = random.uniform(0.2, 0.35)
+        self.morphology.append(MorphologyGene(
+            size=[torso_w, torso_h, torso_d],
+            parent_index=-1
+        ))
+        self.brain.append(BrainGene())
+        
+        # Create legs: attach to sides/bottom of torso
+        num_legs = num_parts - 1
+        for leg_i in range(num_legs):
+            # Leg dimensions: thin and longish
+            leg_w = random.uniform(0.06, 0.12)
+            leg_h = random.uniform(0.15, 0.35)
+            leg_d = random.uniform(0.06, 0.12)
             
-            # Additional limbs — all attached to the torso initially
-            for _ in range(num_initial_parts - 1):
-                self.add_random_part()
+            # Attach to sides of torso
+            if num_legs == 2:
+                x_off = torso_w * 0.5 * (1 if leg_i == 0 else -1)
+            elif num_legs == 4:
+                x_off = torso_w * 0.5 * (1 if leg_i % 2 == 0 else -1)
+            else:
+                x_off = random.uniform(-torso_w * 0.5, torso_w * 0.5)
+            
+            # Spread legs along the body length
+            if num_legs >= 4:
+                z_off = torso_d * 0.3 * (1 if leg_i < 2 else -1)
+            else:
+                z_off = random.uniform(-torso_d * 0.3, torso_d * 0.3)
+            
+            y_off = -torso_h * 0.5  # attach below torso
+            
+            self.morphology.append(MorphologyGene(
+                size=[leg_w, leg_h, leg_d],
+                parent_index=0,
+                attach_offset=[x_off, y_off, z_off],
+                joint_axis=[0, 0, 1]  # swing forward/backward
+            ))
+            self.brain.append(BrainGene(
+                phase=3.14 * (leg_i % 2)  # Alternate phase for walking gait
+            ))
                 
     def add_random_part(self):
-        # Attach to the torso (index 0) most of the time for stability
-        parent_idx = 0 if random.random() < 0.7 else random.randint(0, len(self.morphology) - 1)
+        parent_idx = 0 if random.random() < 0.8 else random.randint(0, len(self.morphology) - 1)
         self.morphology.append(MorphologyGene(parent_index=parent_idx))
         self.brain.append(BrainGene())
 
     def mutate(self):
-        """Applies parametric and structural mutations to the genome."""
-        # 1. Parametric Mutations (change existing genes)
+        """Applies parametric and structural mutations."""
         for m_gene in self.morphology:
             m_gene.mutate()
         for b_gene in self.brain:
             b_gene.mutate()
             
-        # 2. Structural Mutations (add or remove body parts)
-        # Add a part (max 6 parts)
-        if random.random() < 0.10 and len(self.morphology) < 6:
+        # Structural: add a limb (rare, max 6)
+        if random.random() < 0.08 and len(self.morphology) < 6:
             self.add_random_part()
             
-        # Remove a part (rare, keep minimum 3)
-        if random.random() < 0.05 and len(self.morphology) > 3:
+        # Structural: remove a limb (very rare, keep min 3)
+        if random.random() < 0.03 and len(self.morphology) > 3:
             self.morphology.pop()
             self.brain.pop()
 
     def clone(self):
-        """Returns a deep copy of this genome."""
         new_genome = Genome()
         new_genome.morphology = copy.deepcopy(self.morphology)
         new_genome.brain = copy.deepcopy(self.brain)
