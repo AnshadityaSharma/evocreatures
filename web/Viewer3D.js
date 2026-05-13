@@ -4,7 +4,7 @@ class Viewer3D {
     this.replay = null;
     this.currentFrame = 0;
     this.isPlaying = false;
-    this.playbackSpeed = 0.25;
+    this.playbackSpeed = 0.5;
     this.frameAccumulator = 0;
     this.meshes = {};
     this.jointLines = [];  // visual connectors between parts

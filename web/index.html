@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
@@ -33,7 +33,9 @@
         </div>
         <h1>Creatures that learn to move themselves</h1>
         <p class="hero-copy">
-          A genetic algorithm evolves articulated bodies and motion controllers in physics simulation. Watch them figure out locomotion from scratch.
+          A physics-based simulation where virtual creatures learn to walk, run, and jump entirely from scratch. 
+          Using a genetic algorithm, the system evolves the creatures' brain (neural controller) over multiple generations. 
+          The ones that travel the furthest pass their genes to the next generation, gradually evolving complex locomotion strategies.
         </p>
         <div class="hero-actions">
           <a class="button primary" href="#demo">View demo replays</a>
@@ -41,14 +43,8 @@
         </div>
       </div>
       <div class="hero-visual">
-        <div class="hero-image-placeholder">
-          <div class="creature-abstract">
-            <div class="box b1"></div>
-            <div class="box b2"></div>
-            <div class="box b3"></div>
-            <div class="box b4"></div>
-          </div>
-          <p>morphology evolves over generations</p>
+        <div class="hero-image-wrapper">
+          <img src="images/hero.png" alt="Futuristic evolved creature render" class="hero-image">
         </div>
       </div>
     </section>
@@ -162,11 +158,6 @@
 
       <div class="player-container">
         <div class="player-header">
-          <div class="mac-dots">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-          </div>
           <div class="player-title">Loading...</div>
         </div>
         
@@ -188,7 +179,7 @@
             <span id="demo-frame-count">0</span> frames
           </div>
           <div class="speed-control">
-            <button id="btn-speed" class="icon-btn speed-btn" title="Toggle playback speed">0.25x</button>
+            <button id="btn-speed" class="icon-btn speed-btn" title="Toggle playback speed">0.5x</button>
           </div>
         </div>
       </div>
