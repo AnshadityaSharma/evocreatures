@@ -6,7 +6,7 @@ pieces connect, and how the whole thing is hosted** — from first principles.
 
 > TL;DR: Python runs a genetic algorithm + physics simulation *offline* and writes
 > JSON files into `web/replays/`. A static website reads those JSON files and
-> animates them in the browser. GitHub Pages serves the `web/` folder. There is no
+> animates them in the browser. Vercel serves the `web/` folder. There is no
 > live server and no database — just Python that generates data, and a webpage that
 > plays it back.
 
@@ -60,21 +60,21 @@ python -m http.server 8000     # serves the current folder on port 8000
 Then open `http://localhost:8000`. `python -m http.server` is a one-line web
 server built into Python — it just hands out the files in the folder.
 
-### On the internet (GitHub Pages)
-Hosting is automated by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+### On the internet (Vercel)
+Hosting is on **Vercel**, configured by [`vercel.json`](vercel.json) at the repo root.
 Here's the whole story:
 
-1. You `git push` to the `main` branch on GitHub.
-2. GitHub sees the push and runs the workflow (a GitHub Action).
-3. The workflow takes **only the `web/` folder** (`path: './web'`) and uploads it
-   as a "Pages artifact".
-4. GitHub Pages publishes those files at
-   `https://<username>.github.io/<repo>/` → `https://anshadityasharma.github.io/evocreatures/`.
+1. The repo is imported once into Vercel and linked to GitHub.
+2. You `git push` to the `main` branch (Vercel's production branch).
+3. Vercel sees the push and reads `vercel.json`, whose `"outputDirectory": "web"`
+   tells it the static site lives in the **`web/` folder** (not the repo root).
+4. Vercel publishes those files at `https://evocreatures.vercel.app/`.
 
-So **deploying = pushing to main**. No build step, no server to manage. Because the
-site is static, GitHub Pages (or Netlify, Vercel, S3, anything) can host it for
-free. The `python/` backend is *not* deployed — it only ever runs on your machine
-to regenerate the JSON, which you then commit.
+So **deploying = pushing to main**. There is no build step and no server to manage;
+`vercel.json` just points Vercel at `web/`. Because the site is static, Vercel (or
+Netlify, S3, GitHub Pages, anything) could host it. The `python/` backend is *not*
+deployed — it only ever runs on your machine to regenerate the JSON, which you then
+commit.
 
 > ⚠️ Important consequence: the replays you see online are whatever `web/replays/`
 > contained **when you last pushed**. If you re-run `main.py` and want the new
@@ -270,7 +270,7 @@ itself, not the UI chrome.
    `POPULATION_SIZE`, `GENERATIONS`, mutation rates).
 2. `cd python && python main.py` → new `gen_*.json` + `history.json` in `web/replays/`.
 3. `cd web && python -m http.server 8000` → open `localhost:8000` to review.
-4. Happy? `git add -A && git commit && git push` → GitHub Pages redeploys the new
+4. Happy? `git add -A && git commit && git push` → Vercel redeploys the new
    replays automatically.
 
 **"I want to change how the site looks":** edit `web/style.css` / `web/index.html`,

@@ -2,7 +2,7 @@
 
 > A population of virtual creatures that **teach themselves to move** using a genetic algorithm and 2D rigid-body physics. No motion is scripted — coordinated locomotion emerges, generation after generation, from selection and mutation alone.
 
-**Live demo:** https://anshadityasharma.github.io/evocreatures/
+**Live demo:** https://evocreatures.vercel.app/
 
 Inspired by Karl Sims' 1994 *Evolved Virtual Creatures*, this project shows a real, reproducible genetic algorithm in action and presents the results in an interactive browser viewer.
 
@@ -59,7 +59,7 @@ coordinated undulating gait that travels **~21 metres** in 8 seconds.
   forward-mover rate, mutation rate, gait frequency, and population size.
 - **Fully reproducible** — a fixed random seed makes every run identical.
 - **Zero-dependency frontend** — static HTML/CSS/JS + Three.js from a CDN; hosts
-  anywhere (GitHub Pages, Netlify, or any static server).
+  anywhere (Vercel, Netlify, or any static server).
 
 ---
 
@@ -167,7 +167,7 @@ walkthrough of every module and the exact JSON schema.
 | Compute    | **NumPy**       | Vectorised gene storage and operators            |
 | Frontend   | **Three.js**    | WebGL rendering of the recorded replays          |
 | Frontend   | **Vanilla JS**  | Controls, stats, and the canvas evolution chart  |
-| Hosting    | **GitHub Pages**| Static hosting via GitHub Actions                |
+| Hosting    | **Vercel**      | Static hosting of the `web/` folder              |
 
 ---
 
@@ -257,7 +257,7 @@ evolving-virtual-creatures/
 │   ├── main.js                 # controls, stats, evolution chart, data loading
 │   ├── Viewer3D.js             # Three.js replay renderer
 │   └── replays/                # generated: gen_<n>.json + history.json
-├── .github/workflows/deploy.yml# GitHub Pages deployment
+├── vercel.json                 # Vercel static-hosting config (serves web/)
 ├── requirements.txt
 ├── README.md
 └── context.md                  # deep-dive: how every part works and connects
