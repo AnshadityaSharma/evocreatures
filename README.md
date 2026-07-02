@@ -42,8 +42,7 @@ The result is a clear, watchable progression: generation 0 creatures thrash
 uselessly and go nowhere; by generation 30 they have discovered a smooth,
 coordinated undulating gait that travels **~21 metres** in 8 seconds.
 
-<!-- SCREENSHOT: hero / evolved worm mid-crawl -->
-<!-- ![Evolved creature](web/images/hero.png) -->
+<!-- SCREENSHOT: drop a screen-capture of the evolved worm mid-crawl here -->
 
 ---
 
@@ -257,7 +256,6 @@ evolving-virtual-creatures/
 │   ├── style.css
 │   ├── main.js                 # controls, stats, evolution chart, data loading
 │   ├── Viewer3D.js             # Three.js replay renderer
-│   ├── images/hero.png
 │   └── replays/                # generated: gen_<n>.json + history.json
 ├── .github/workflows/deploy.yml# GitHub Pages deployment
 ├── requirements.txt
