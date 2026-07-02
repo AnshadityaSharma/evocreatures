@@ -1,89 +1,91 @@
-import os
+"""Entry point: run the evolutionary loop and export replays + metrics.
+
+Usage
+-----
+    python main.py
+
+Outputs (written to ``web/replays/``):
+* ``gen_<n>.json``  — replay of the best creature at generation ``n``
+* ``history.json``  — per-generation metrics used to draw the evolution charts
+"""
+from __future__ import annotations
+
+import dataclasses
 import json
-from evolution.ga import init_population, mutate_population
-from evolution.fitness import evaluate_fitness
-from simulation.physics_world import PhysicsWorld
-from simulation.creature_builder import build_creature_from_genome
-from simulation.sensors import DynamicSensors
-from simulation.controller import GenomeController
-from replay.recorder import ReplayRecorder
-from utils.config import SIMULATION_STEPS, TIME_STEP
+from pathlib import Path
 
-GENERATIONS = 100
-POPULATION_SIZE = 20
-SAVE_EVERY_N_GENS = 10
+from evolution.ga import GeneticAlgorithm
+from replay.recorder import build_replay, save_replay
+from simulation.evaluator import evaluate
+from utils import config
 
-def record_and_save_replay(genome, filename, generation, fitness):
-    world = PhysicsWorld(gui=False)
-    creature = build_creature_from_genome(genome, world.client_id)
-    sensors = DynamicSensors(creature)
-    controller = GenomeController(genome)
-    recorder = ReplayRecorder(TIME_STEP, creature)
-    
-    for step in range(SIMULATION_STEPS):
-        time_seconds = step * TIME_STEP
-        sensor_data = sensors.get_state()
-        targets = controller.get_target_angles(time_seconds, sensor_data)
-        creature.set_joint_positions(targets)
-        world.step()
-        recorder.record_frame(step)
-        
-    world.disconnect()
-    
-    replay_data = recorder.get_replay_data()
-    replay_data["metadata"] = {
-        "generation": generation,
-        "fitness": round(fitness, 4),
-        "num_parts": len(genome.morphology),
-        "population_size": POPULATION_SIZE,
-        "sim_seconds": round(SIMULATION_STEPS * TIME_STEP, 2),
+REPLAYS_DIR = Path(__file__).resolve().parent.parent / "web" / "replays"
+
+
+def _record_best(algo: GeneticAlgorithm, stats, saved_gens: list[int]) -> None:
+    """Re-run the generation's best genome with recording on and save its replay."""
+    result = evaluate(algo.best.genome, record=True)
+    metadata = {
+        "generation": stats.generation,
+        "fitness": round(stats.best, 3),
+        "distance": round(stats.best_distance, 3),
+        "average_fitness": round(stats.average, 3),
+        "population_size": config.POPULATION_SIZE,
+        "num_parts": len(result.part_specs),
+        "mutation_rate": round(stats.mutation_rate, 3),
+        "survival_rate": round(stats.survival_rate, 3),
+        "frequency": round(algo.best.genome.frequency, 3),
+        "sim_seconds": config.SIM_SECONDS,
     }
-    # Store parent-child relationships for visual joints
-    connections = []
-    for i in range(1, len(genome.morphology)):
-        connections.append({
-            "parent": f"part_{genome.morphology[i].parent_index}",
-            "child": f"part_{i}",
-        })
-    replay_data["connections"] = connections
-    
-    replays_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "web", "replays")
-    os.makedirs(replays_dir, exist_ok=True)
-    filepath = os.path.join(replays_dir, filename)
-    with open(filepath, "w") as f:
-        json.dump(replay_data, f)
-    print(f"  Saved replay: {filename}")
+    replay = build_replay(result, metadata)
+    save_replay(replay, REPLAYS_DIR / f"gen_{stats.generation}.json")
+    saved_gens.append(stats.generation)
 
 
-def run_evolution():
-    print(f"Starting evolution: {GENERATIONS} generations, {POPULATION_SIZE} creatures each", flush=True)
-    print(f"Simulation: {SIMULATION_STEPS} steps ({SIMULATION_STEPS * TIME_STEP:.1f}s) per creature", flush=True)
-    print("-" * 60, flush=True)
-    
-    population = init_population(POPULATION_SIZE, num_parts=5)  # torso + 4 legs
-    
-    for generation in range(GENERATIONS + 1):
-        fitness_scores = []
-        for genome in population:
-            score = evaluate_fitness(genome, gui=False)
-            fitness_scores.append((score, genome))
-            
-        fitness_scores.sort(key=lambda x: x[0], reverse=True)
-        population = [g for s, g in fitness_scores]
-        best_score = fitness_scores[0][0]
-        avg_score = sum(s for s, g in fitness_scores) / len(fitness_scores)
-        
-        parts_count = len(population[0].morphology)
-        print(f"Gen {generation:03d} | Best: {best_score:7.3f} | Avg: {avg_score:7.3f} | Parts: {parts_count}", flush=True)
-        
-        if generation % SAVE_EVERY_N_GENS == 0:
-            record_and_save_replay(population[0], f"gen_{generation}.json", generation, best_score)
-            
-        if generation < GENERATIONS:
-            population = mutate_population(population, keep_best=True)
-    
-    print("-" * 60, flush=True)
-    print("Evolution complete!", flush=True)
+def run_evolution() -> None:
+    print(
+        f"Evolving {config.POPULATION_SIZE} creatures over {config.GENERATIONS} "
+        f"generations ({config.SIM_SECONDS:.0f}s evaluation each)."
+    )
+    print("-" * 68)
+
+    algo = GeneticAlgorithm()
+    saved_gens: list[int] = []
+    total = config.GENERATIONS
+
+    for generation in range(total + 1):
+        algo.evaluate_population()
+        sigma = algo._sigma(generation)
+        stats = algo.record_stats(generation, sigma)
+
+        print(
+            f"Gen {generation:3d} | best {stats.best:7.3f} | avg {stats.average:7.3f} "
+            f"| dist {stats.best_distance:6.2f}m | forward {stats.survival_rate:4.0%}"
+        )
+
+        if generation % config.SAVE_EVERY_N_GENS == 0 or generation == total:
+            _record_best(algo, stats, saved_gens)
+
+        if generation < total:
+            algo.next_generation(sigma)
+
+    history = {
+        "generations": [dataclasses.asdict(s) for s in algo.history],
+        "saved_generations": sorted(set(saved_gens)),
+        "config": {
+            "population_size": config.POPULATION_SIZE,
+            "generations": config.GENERATIONS,
+            "elite_count": config.ELITE_COUNT,
+            "tournament_size": config.TOURNAMENT_SIZE,
+            "crossover_rate": config.CROSSOVER_RATE,
+            "sim_seconds": config.SIM_SECONDS,
+        },
+    }
+    (REPLAYS_DIR / "history.json").write_text(json.dumps(history, indent=2), encoding="utf-8")
+
+    print("-" * 68)
+    print(f"Done. Saved {len(set(saved_gens))} replays + history.json to {REPLAYS_DIR}")
+
 
 if __name__ == "__main__":
     run_evolution()

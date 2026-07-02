@@ -1,115 +1,114 @@
+"""Genome definition and genetic operators.
+
+A genome encodes the *controller* for a creature — the parameters of a central
+pattern generator (CPG) that drives the motorised hinges between its body
+segments. The body plan (morphology) is fixed for every creature (see
+``utils.config``), which isolates the learning problem to "find a gait that
+crawls forward" and makes evolutionary progress easy to observe.
+
+Gene layout
+-----------
+* ``frequency``            one shared gait frequency (Hz)
+* ``amplitude[i]``         swing amplitude of joint ``i`` (rad)
+* ``phase[i]``             phase offset of joint ``i`` (rad)
+* ``center[i]``            rest-angle offset of joint ``i`` (rad)
+
+The parameters are stored in a flat NumPy vector so crossover and mutation are
+simple, vectorised array operations.
+"""
+from __future__ import annotations
+
 import random
-import copy
 
-class MorphologyGene:
-    def __init__(self, size=None, parent_index=None, attach_offset=None, joint_axis=None):
-        self.size = size or [0.1, 0.1, 0.3]
-        self.parent_index = parent_index if parent_index is not None else 0
-        self.attach_offset = attach_offset or [0, 0, -0.05]
-        self.joint_axis = joint_axis or [1, 0, 0]
+import numpy as np
 
-    def mutate(self):
-        # Allow more dramatic size mutations to grow longer legs
-        if random.random() < 0.3:
-            idx = random.randint(0, 2)
-            self.size[idx] += random.uniform(-0.1, 0.1)
-            self.size[idx] = max(0.04, min(1.0, self.size[idx]))
-        
-        if random.random() < 0.2:
-            idx = random.randint(0, 2)
-            self.attach_offset[idx] += random.uniform(-0.05, 0.05)
-            self.attach_offset[idx] = max(-0.6, min(0.6, self.attach_offset[idx]))
+from utils import config
 
 
-class BrainGene:
-    def __init__(self, amplitude=None, frequency=None, phase=None, sensor_weights=None):
-        self.amplitude = amplitude if amplitude is not None else random.uniform(0.1, 1.0)
-        self.frequency = frequency if frequency is not None else random.uniform(0.5, 3.0)
-        self.phase = phase if phase is not None else random.uniform(-3.14, 3.14)
-        self.sensor_weights = sensor_weights or [random.uniform(-0.5, 0.5) for _ in range(3)]
+# Index layout of the flat gene vector.
+_N = config.NUM_JOINTS
+FREQ_IDX = 0
+AMP_SLICE = slice(1, 1 + _N)
+PHASE_SLICE = slice(1 + _N, 1 + 2 * _N)
+CENTER_SLICE = slice(1 + 2 * _N, 1 + 3 * _N)
+GENE_COUNT = 1 + 3 * _N
 
-    def mutate(self):
-        # Increased mutation rates and ranges to allow for significant evolution
-        if random.random() < 0.5:
-            self.amplitude += random.uniform(-0.2, 0.2)
-            self.amplitude = max(0.1, min(1.5, self.amplitude)) # allow larger swings
-        if random.random() < 0.5:
-            self.frequency += random.uniform(-0.5, 0.5)
-            self.frequency = max(0.2, min(5.0, self.frequency)) # allow faster swings
-        if random.random() < 0.5:
-            self.phase += random.uniform(-0.8, 0.8)
-            # Wrap phase between -pi and pi
-            if self.phase > 3.14: self.phase -= 6.28
-            if self.phase < -3.14: self.phase += 6.28
-        if random.random() < 0.3:
-            idx = random.randint(0, 2)
-            self.sensor_weights[idx] += random.uniform(-0.2, 0.2)
-            self.sensor_weights[idx] = max(-1.0, min(1.0, self.sensor_weights[idx]))
+# Per-gene lower/upper bounds, aligned with the flat vector layout.
+_LOWER = np.empty(GENE_COUNT)
+_UPPER = np.empty(GENE_COUNT)
+_LOWER[FREQ_IDX], _UPPER[FREQ_IDX] = config.FREQ_RANGE
+_LOWER[AMP_SLICE], _UPPER[AMP_SLICE] = config.AMPLITUDE_RANGE
+_LOWER[PHASE_SLICE], _UPPER[PHASE_SLICE] = config.PHASE_RANGE
+_CENTER_LO, _CENTER_HI = config.CENTER_RANGE
+_LOWER[CENTER_SLICE], _UPPER[CENTER_SLICE] = _CENTER_LO, _CENTER_HI
+
+# Relative mutation scale per gene group (phases roam more freely than offsets).
+_SIGMA_SCALE = np.empty(GENE_COUNT)
+_SIGMA_SCALE[FREQ_IDX] = 0.30
+_SIGMA_SCALE[AMP_SLICE] = 0.20
+_SIGMA_SCALE[PHASE_SLICE] = 0.35
+_SIGMA_SCALE[CENTER_SLICE] = 0.15
+_SPAN = _UPPER - _LOWER
 
 
 class Genome:
-    def __init__(self, num_initial_parts=None):
-        self.morphology = []
-        self.brain = []
-        
-        if num_initial_parts is not None:
-            self._build_quadruped()
-    
-    def _build_quadruped(self):
-        """Create a basic quadruped layout, but with COMPLETELY RANDOM brain parameters.
-        
-        This forces evolution to start from a completely uncoordinated state
-        (flailing randomly) and learn a coordinated gait over time.
+    """A creature controller expressed as a flat vector of CPG parameters."""
+
+    __slots__ = ("genes",)
+
+    def __init__(self, genes: np.ndarray | None = None):
+        self.genes = np.asarray(genes, dtype=float) if genes is not None else self.random_genes()
+
+    # -- construction -------------------------------------------------------- #
+    @staticmethod
+    def random_genes(rng: random.Random | None = None) -> np.ndarray:
+        """Draw a uniformly random genome inside the configured bounds."""
+        r = np.random.default_rng(None if rng is None else rng.randint(0, 2**31 - 1))
+        return _LOWER + r.random(GENE_COUNT) * _SPAN
+
+    @classmethod
+    def random(cls, rng: random.Random | None = None) -> "Genome":
+        return cls(cls.random_genes(rng))
+
+    # -- structured accessors ----------------------------------------------- #
+    @property
+    def frequency(self) -> float:
+        return float(self.genes[FREQ_IDX])
+
+    @property
+    def amplitudes(self) -> np.ndarray:
+        return self.genes[AMP_SLICE]
+
+    @property
+    def phases(self) -> np.ndarray:
+        return self.genes[PHASE_SLICE]
+
+    @property
+    def centers(self) -> np.ndarray:
+        return self.genes[CENTER_SLICE]
+
+    # -- genetic operators --------------------------------------------------- #
+    def clone(self) -> "Genome":
+        return Genome(self.genes.copy())
+
+    def mutate(self, sigma: float, rng: random.Random) -> "Genome":
+        """Return a mutated copy using bounded Gaussian perturbations.
+
+        ``sigma`` scales the global mutation strength (annealed over the run).
+        Each gene is perturbed with probability ``GENE_MUTATION_RATE`` by noise
+        proportional to its own range, then clamped back inside its bounds.
         """
-        # --- TORSO ---
-        torso_w = random.uniform(0.25, 0.4)
-        torso_d = random.uniform(0.3, 0.5)
-        torso_h = random.uniform(0.08, 0.14)
-        
-        self.morphology.append(MorphologyGene(
-            size=[torso_w, torso_d, torso_h],
-            parent_index=-1
-        ))
-        self.brain.append(BrainGene())
-        
-        # --- 4 LEGS ---
-        leg_thickness = random.uniform(0.04, 0.08)
-        leg_length = random.uniform(0.2, 0.3) # Start with short legs
-        
-        corners = [
-            ( torso_w * 0.4,  torso_d * 0.35, -torso_h * 0.5),
-            (-torso_w * 0.4,  torso_d * 0.35, -torso_h * 0.5),
-            ( torso_w * 0.4, -torso_d * 0.35, -torso_h * 0.5),
-            (-torso_w * 0.4, -torso_d * 0.35, -torso_h * 0.5),
-        ]
-        
-        for leg_i, (cx, cy, cz) in enumerate(corners):
-            leg_w = leg_thickness + random.uniform(-0.01, 0.01)
-            leg_d = leg_thickness + random.uniform(-0.01, 0.01)
-            leg_h = leg_length + random.uniform(-0.02, 0.02)
-            
-            self.morphology.append(MorphologyGene(
-                size=[leg_w, leg_d, leg_h],
-                parent_index=0,
-                attach_offset=[cx, cy, cz],
-                joint_axis=[1, 0, 0]
-            ))
-            # No hardcoded trot! Completely random phases and frequencies.
-            self.brain.append(BrainGene(
-                amplitude=random.uniform(0.2, 0.6),
-                frequency=random.uniform(0.5, 2.0),
-                phase=random.uniform(-3.14, 3.14)
-            ))
+        genes = self.genes.copy()
+        for i in range(GENE_COUNT):
+            if rng.random() < config.GENE_MUTATION_RATE:
+                step = rng.gauss(0.0, sigma * _SIGMA_SCALE[i] * _SPAN[i])
+                genes[i] += step
+        np.clip(genes, _LOWER, _UPPER, out=genes)
+        return Genome(genes)
 
-    def mutate(self):
-        """Mutate brain parameters (heavily) and morphology."""
-        for b_gene in self.brain:
-            b_gene.mutate()
-        for m_gene in self.morphology:
-            m_gene.mutate()
-
-    def clone(self):
-        new_genome = Genome()
-        new_genome.morphology = copy.deepcopy(self.morphology)
-        new_genome.brain = copy.deepcopy(self.brain)
-        return new_genome
+    @staticmethod
+    def crossover(a: "Genome", b: "Genome", rng: random.Random) -> "Genome":
+        """Uniform crossover: each gene is inherited from either parent."""
+        mask = np.array([rng.random() < 0.5 for _ in range(GENE_COUNT)])
+        genes = np.where(mask, a.genes, b.genes)
+        return Genome(genes)

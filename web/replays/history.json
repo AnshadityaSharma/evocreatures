@@ -1,0 +1,362 @@
+{
+  "generations": [
+    {
+      "generation": 0,
+      "best": 0.0,
+      "average": 0.0,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 0.0,
+      "survival_rate": 0.0,
+      "mutation_rate": 1.0,
+      "best_distance": 6.919845646837868
+    },
+    {
+      "generation": 1,
+      "best": 0.0,
+      "average": 0.0,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 0.0,
+      "survival_rate": 0.0,
+      "mutation_rate": 0.9717241379310345,
+      "best_distance": 6.919845646837868
+    },
+    {
+      "generation": 2,
+      "best": 0.0,
+      "average": 0.0,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 0.0,
+      "survival_rate": 0.0,
+      "mutation_rate": 0.9434482758620689,
+      "best_distance": 6.919845646837868
+    },
+    {
+      "generation": 3,
+      "best": 0.0,
+      "average": 0.0,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 0.0,
+      "survival_rate": 0.0,
+      "mutation_rate": 0.9151724137931034,
+      "best_distance": 6.919845646837868
+    },
+    {
+      "generation": 4,
+      "best": 0.0,
+      "average": 0.0,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 0.0,
+      "survival_rate": 0.0,
+      "mutation_rate": 0.886896551724138,
+      "best_distance": 6.919845646837868
+    },
+    {
+      "generation": 5,
+      "best": 1.277650341016174,
+      "average": 0.02555300682032348,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 0.17887104774226434,
+      "survival_rate": 0.02,
+      "mutation_rate": 0.8586206896551724,
+      "best_distance": 8.273567377353753
+    },
+    {
+      "generation": 6,
+      "best": 1.277650341016174,
+      "average": 0.02555300682032348,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 0.17887104774226434,
+      "survival_rate": 0.02,
+      "mutation_rate": 0.8303448275862069,
+      "best_distance": 8.273567377353753
+    },
+    {
+      "generation": 7,
+      "best": 2.42379572102213,
+      "average": 0.0901786383852392,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 0.393766432284657,
+      "survival_rate": 0.06,
+      "mutation_rate": 0.8020689655172414,
+      "best_distance": 9.517915955572331
+    },
+    {
+      "generation": 8,
+      "best": 4.953323849332532,
+      "average": 0.18924511537188982,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 0.7861798900063599,
+      "survival_rate": 0.08,
+      "mutation_rate": 0.7737931034482759,
+      "best_distance": 12.044084451784714
+    },
+    {
+      "generation": 9,
+      "best": 5.41517282792001,
+      "average": 0.4605873173092793,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.2614894983396752,
+      "survival_rate": 0.14,
+      "mutation_rate": 0.7455172413793103,
+      "best_distance": 15.29075513876675
+    },
+    {
+      "generation": 10,
+      "best": 5.41517282792001,
+      "average": 0.3869172155203253,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.1984592571853918,
+      "survival_rate": 0.14,
+      "mutation_rate": 0.7172413793103447,
+      "best_distance": 15.29075513876675
+    },
+    {
+      "generation": 11,
+      "best": 5.41517282792001,
+      "average": 0.36430320494428253,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.203100375947819,
+      "survival_rate": 0.1,
+      "mutation_rate": 0.6889655172413793,
+      "best_distance": 15.29075513876675
+    },
+    {
+      "generation": 12,
+      "best": 5.875155732589166,
+      "average": 0.40642700354256855,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.3910100101414837,
+      "survival_rate": 0.08,
+      "mutation_rate": 0.6606896551724137,
+      "best_distance": 12.962295392675914
+    },
+    {
+      "generation": 13,
+      "best": 5.875155732589166,
+      "average": 0.4215108932974827,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.3270420359204729,
+      "survival_rate": 0.14,
+      "mutation_rate": 0.6324137931034483,
+      "best_distance": 12.962295392675914
+    },
+    {
+      "generation": 14,
+      "best": 5.875155732589166,
+      "average": 0.38048577461993316,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.305619287441131,
+      "survival_rate": 0.1,
+      "mutation_rate": 0.6041379310344828,
+      "best_distance": 12.962295392675914
+    },
+    {
+      "generation": 15,
+      "best": 5.875155732589166,
+      "average": 0.4862859896449003,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.4543708151624861,
+      "survival_rate": 0.12,
+      "mutation_rate": 0.5758620689655172,
+      "best_distance": 12.962295392675914
+    },
+    {
+      "generation": 16,
+      "best": 5.875155732589166,
+      "average": 0.440924792025251,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.406377282168129,
+      "survival_rate": 0.1,
+      "mutation_rate": 0.5475862068965517,
+      "best_distance": 12.962295392675914
+    },
+    {
+      "generation": 17,
+      "best": 5.875155732589166,
+      "average": 0.5730112733601842,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.5481296596202885,
+      "survival_rate": 0.14,
+      "mutation_rate": 0.5193103448275862,
+      "best_distance": 12.962295392675914
+    },
+    {
+      "generation": 18,
+      "best": 7.303237626986966,
+      "average": 0.6866896059044261,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.7273151970814091,
+      "survival_rate": 0.16,
+      "mutation_rate": 0.4910344827586206,
+      "best_distance": 14.37772962257502
+    },
+    {
+      "generation": 19,
+      "best": 7.303237626986966,
+      "average": 0.7714129917244105,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.8269566445297405,
+      "survival_rate": 0.18,
+      "mutation_rate": 0.4627586206896551,
+      "best_distance": 14.37772962257502
+    },
+    {
+      "generation": 20,
+      "best": 7.303237626986966,
+      "average": 0.9382945305132564,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 1.8096232782200605,
+      "survival_rate": 0.32,
+      "mutation_rate": 0.4344827586206895,
+      "best_distance": 14.37772962257502
+    },
+    {
+      "generation": 21,
+      "best": 9.535414402114807,
+      "average": 1.2786031008598473,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 2.5458842332423055,
+      "survival_rate": 0.22,
+      "mutation_rate": 0.40620689655172404,
+      "best_distance": 16.60385863494412
+    },
+    {
+      "generation": 22,
+      "best": 9.535414402114807,
+      "average": 0.9752404031298995,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 2.236889976229374,
+      "survival_rate": 0.2,
+      "mutation_rate": 0.37793103448275855,
+      "best_distance": 16.60385863494412
+    },
+    {
+      "generation": 23,
+      "best": 9.535414402114807,
+      "average": 0.8942816672129498,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 2.1628060264897604,
+      "survival_rate": 0.22,
+      "mutation_rate": 0.34965517241379307,
+      "best_distance": 16.60385863494412
+    },
+    {
+      "generation": 24,
+      "best": 9.535414402114807,
+      "average": 0.6928838466191836,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 2.0384152400466653,
+      "survival_rate": 0.12,
+      "mutation_rate": 0.3213793103448276,
+      "best_distance": 16.60385863494412
+    },
+    {
+      "generation": 25,
+      "best": 10.298986174339733,
+      "average": 0.9743562782232249,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 2.3998400371806574,
+      "survival_rate": 0.2,
+      "mutation_rate": 0.2931034482758621,
+      "best_distance": 17.3674822370652
+    },
+    {
+      "generation": 26,
+      "best": 13.918698845214134,
+      "average": 1.6326493206343178,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 3.5460014658697605,
+      "survival_rate": 0.28,
+      "mutation_rate": 0.2648275862068965,
+      "best_distance": 20.9966677922327
+    },
+    {
+      "generation": 27,
+      "best": 13.918698845214134,
+      "average": 1.565685284203813,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 3.5901140149033384,
+      "survival_rate": 0.26,
+      "mutation_rate": 0.23655172413793102,
+      "best_distance": 20.9966677922327
+    },
+    {
+      "generation": 28,
+      "best": 13.918698845214134,
+      "average": 1.6372889792355434,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 3.454413559537881,
+      "survival_rate": 0.3,
+      "mutation_rate": 0.20827586206896542,
+      "best_distance": 20.9966677922327
+    },
+    {
+      "generation": 29,
+      "best": 13.918698845214134,
+      "average": 2.5984033566768745,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 4.392838383145322,
+      "survival_rate": 0.42,
+      "mutation_rate": 0.17999999999999994,
+      "best_distance": 20.9966677922327
+    },
+    {
+      "generation": 30,
+      "best": 13.918698845214134,
+      "average": 2.8087639281520285,
+      "median": 0.0,
+      "worst": 0.0,
+      "std": 4.287833896990573,
+      "survival_rate": 0.42,
+      "mutation_rate": 0.15172413793103434,
+      "best_distance": 20.9966677922327
+    }
+  ],
+  "saved_generations": [
+    0,
+    5,
+    10,
+    15,
+    20,
+    25,
+    30
+  ],
+  "config": {
+    "population_size": 50,
+    "generations": 30,
+    "elite_count": 3,
+    "tournament_size": 5,
+    "crossover_rate": 0.8,
+    "sim_seconds": 8.0
+  }
+}

@@ -1,6 +1,13 @@
+# Python
 __pycache__/
 *.pyc
 .venv/
 venv/
-web/server*.log
+
+# Local tooling / scratch
+.claude/
 for_me.md
+web/server*.log
+
+# Unrelated generated output that happens to live in this working tree
+outputs/

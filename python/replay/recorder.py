@@ -1,37 +1,53 @@
+"""Serialises an evaluation into a compact replay JSON for the web viewer.
+
+Replay format (version 3)
+-------------------------
+The simulation is planar, so each part is described by an ``(x, y)`` position and
+a single rotation angle about the out-of-plane axis::
+
+    {
+      "version": 3,
+      "time_step": <seconds between recorded frames>,
+      "parts":  { "part_0": {"shape": "box", "size": [w, h, depth]}, ... },
+      "connections": [ {"parent": "part_0", "child": "part_1"}, ... ],
+      "frames": [ {"t": <s>, "parts": [[x, y, angle], ...]}, ... ],
+      "metadata": { ... generation stats for the UI ... }
+    }
+"""
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
+from utils import config
 
-class ReplayRecorder:
-    def __init__(self, time_step, creature):
-        self.time_step = time_step
-        self.creature = creature
-        self.frames = []
 
-    def record_frame(self, step):
-        self.frames.append(
-            {
-                "step": step,
-                "time": step * self.time_step,
-                "parts": self.creature.body_transforms(),
-                "joints": {
-                    "angles": self.creature.joint_angles(),
-                },
-            }
-        )
+def build_replay(result, metadata: dict) -> dict:
+    parts = {}
+    for i, (w, h) in enumerate(result.part_specs):
+        parts[f"part_{i}"] = {"shape": "box", "size": [w, h, config.RENDER_DEPTH]}
 
-    def get_replay_data(self):
-        return {
-            "name": "evolved_creature",
-            "version": 2,
-            "time_step": self.time_step,
-            "parts": self.creature.parts,
-            "frames": self.frames,
-        }
+    connections = [
+        {"parent": "part_0", "child": f"part_{i}"}
+        for i in range(1, len(result.part_specs))
+    ]
 
-    def save(self, output_path):
-        output_path = Path(output_path)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        replay = self.get_replay_data()
-        output_path.write_text(json.dumps(replay, indent=2), encoding="utf-8")
-        return output_path
+    frames = [
+        {"t": frame["t"], "parts": [[round(v, 4) for v in part] for part in frame["parts"]]}
+        for frame in result.frames
+    ]
+
+    return {
+        "name": "evolved_creature",
+        "version": 3,
+        "time_step": round(config.RECORD_EVERY * config.TIME_STEP, 5),
+        "parts": parts,
+        "connections": connections,
+        "frames": frames,
+        "metadata": metadata,
+    }
+
+
+def save_replay(replay: dict, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(replay, separators=(",", ":")), encoding="utf-8")

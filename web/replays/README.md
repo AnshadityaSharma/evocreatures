@@ -1,24 +1,23 @@
-# Replay Format
+# Replay data (generated)
 
-Replay files are JSON exports from the Python simulation.
+These JSON files are **generated** by the Python backend (`python/main.py`) — do
+not edit them by hand. The browser does not run physics; it reads these files and
+renders them with Three.js. See [`../../context.md`](../../context.md) for the full
+data contract.
 
-The browser does not run physics. It reads these frames and renders them with Three.js.
+- `gen_<n>.json` — recorded replay of the best creature at generation `n`.
+- `history.json` — per-generation metrics used to draw the evolution chart.
 
-## Top Level
-- `name`: replay name
-- `version`: replay format version
-- `time_step`: simulation time between frames
-- `parts`: render metadata for each creature body part
-- `frames`: recorded simulation frames
+## Replay format (version 3)
 
-## Frame
-Each frame contains:
-- `step`: simulation step index
-- `time`: elapsed simulation time in seconds
-- `parts`: world transforms for each body part
-- `joints`: joint state values, such as hinge angle
+The simulation is 2D, so each part has an `(x, y)` position and one rotation
+`angle` (radians).
 
-## Part Transform
-Each part transform contains:
-- `position`: `[x, y, z]`
-- `orientation`: quaternion `[x, y, z, w]`
+| Field         | Meaning                                                        |
+|---------------|----------------------------------------------------------------|
+| `version`     | replay format version (3)                                      |
+| `time_step`   | seconds between recorded frames (~1/60)                        |
+| `parts`       | `{ "part_i": { "shape": "box", "size": [w, h, depth] } }`      |
+| `connections` | `[{ "parent": "part_0", "child": "part_1" }, ...]` (reference) |
+| `frames`      | `[{ "t": seconds, "parts": [[x, y, angle], ...] }, ...]`       |
+| `metadata`    | generation stats displayed in the UI                          |

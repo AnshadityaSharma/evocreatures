@@ -3,213 +3,181 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EVOCREATURES</title>
-  
+  <title>EvoCreatures — evolving virtual creatures with a genetic algorithm</title>
+  <meta name="description" content="Watch virtual creatures evolve locomotion from scratch with a genetic algorithm and 2D physics. Interactive replays of every generation.">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="style.css?v=4">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <header class="site-header">
-    <a class="brand" href="#top">EVOCREATURES</a>
+    <a class="brand" href="#top">EVO<span>CREATURES</span></a>
     <nav class="site-nav">
       <a href="#about">About</a>
-      <a href="#pipeline">How it works</a>
-      <a href="#tech">Tech</a>
-      <a href="#demo">Demo</a>
-      <a href="#">Source &#8599;</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#algorithm">Algorithm</a>
+      <a href="#demo">Live demo</a>
+      <a class="nav-source" href="https://github.com/AnshadityaSharma/evocreatures" target="_blank" rel="noopener">GitHub &#8599;</a>
     </nav>
   </header>
 
   <main id="top">
-    <!-- HERO SECTION -->
+    <!-- HERO -->
     <section id="about" class="hero">
       <div class="hero-content">
-        <div class="pill">
-          <span class="pill-text">KARL SIMS &bull; INSPIRED</span>
-        </div>
-        <h1>Creatures that learn to move themselves</h1>
+        <div class="pill">KARL SIMS &bull; INSPIRED</div>
+        <h1>Creatures that <span class="grad">evolve</span> how to move.</h1>
         <p class="hero-copy">
-          A physics-based simulation where virtual creatures learn to walk, run, and jump entirely from scratch. 
-          Using a genetic algorithm, the system evolves the creatures' brain (neural controller) over multiple generations. 
-          The ones that travel the furthest pass their genes to the next generation, gradually evolving complex locomotion strategies.
+          A population of virtual creatures starts out flailing uselessly. A genetic
+          algorithm scores each one on how far it crawls, breeds the winners, and
+          mutates their controllers. Generation after generation, coordinated
+          locomotion emerges from pure trial and error — no motion is scripted.
         </p>
         <div class="hero-actions">
-          <a class="button primary" href="#demo">View demo replays</a>
-          <a class="button secondary" href="#pipeline">Read how it works</a>
+          <a class="button primary" href="#demo">Watch it evolve</a>
+          <a class="button secondary" href="#algorithm">How the GA works</a>
+        </div>
+        <div class="hero-metrics">
+          <div><b id="hero-gens">30</b><span>generations</span></div>
+          <div><b id="hero-gain">—</b><span>distance gain</span></div>
+          <div><b id="hero-pop">50</b><span>population</span></div>
         </div>
       </div>
       <div class="hero-visual">
         <div class="hero-image-wrapper">
-          <img src="images/hero.png" alt="Futuristic evolved creature render" class="hero-image">
+          <img src="images/hero.png" alt="Evolved virtual creature render" class="hero-image">
         </div>
       </div>
     </section>
 
-    <!-- SYSTEM OVERVIEW -->
+    <!-- PIPELINE -->
     <section id="pipeline" class="section">
-      <p class="eyebrow">SYSTEM OVERVIEW</p>
-      <h2>How evolution works</h2>
-      <p class="section-desc">Six stages run offline in Python. The browser only plays back the results.</p>
-      
+      <p class="eyebrow">System overview</p>
+      <h2>The evolution pipeline</h2>
+      <p class="section-desc">Everything below runs offline in Python. The browser only replays the recorded results.</p>
       <div class="pipeline-grid">
-        <article class="pipeline-card">
-          <div class="step-number">01</div>
-          <h3>Genome</h3>
-          <p>Morphology + controller params</p>
-        </article>
-        <div class="arrow">&rarr;</div>
-        <article class="pipeline-card">
-          <div class="step-number">02</div>
-          <h3>Build body</h3>
-          <p>Assemble creature in PyBullet</p>
-        </article>
-        <div class="arrow">&rarr;</div>
-        <article class="pipeline-card">
-          <div class="step-number">03</div>
-          <h3>Simulate</h3>
-          <p>Physics + torque control</p>
-        </article>
-        <div class="arrow">&rarr;</div>
-        <article class="pipeline-card">
-          <div class="step-number">04</div>
-          <h3>Fitness</h3>
-          <p>Distance traveled</p>
-        </article>
-        <div class="arrow">&rarr;</div>
-        <article class="pipeline-card">
-          <div class="step-number">05</div>
-          <h3>Mutate</h3>
-          <p>Genetic algorithm loop</p>
-        </article>
-        <div class="arrow">&rarr;</div>
-        <article class="pipeline-card">
-          <div class="step-number">06</div>
-          <h3>Replay</h3>
-          <p>JSON &rarr; Three.js browser</p>
-        </article>
+        <article class="pipeline-card"><span class="step">01</span><h3>Genome</h3><p>CPG controller parameters</p></article>
+        <article class="pipeline-card"><span class="step">02</span><h3>Build body</h3><p>Assemble the worm in pymunk</p></article>
+        <article class="pipeline-card"><span class="step">03</span><h3>Simulate</h3><p>8&nbsp;s of 2D physics</p></article>
+        <article class="pipeline-card"><span class="step">04</span><h3>Fitness</h3><p>Score forward distance</p></article>
+        <article class="pipeline-card"><span class="step">05</span><h3>Select &amp; breed</h3><p>Tournament + crossover</p></article>
+        <article class="pipeline-card"><span class="step">06</span><h3>Replay</h3><p>Export JSON &rarr; Three.js</p></article>
       </div>
     </section>
 
-    <!-- TECH STACK -->
-    <section id="tech" class="section">
-      <p class="eyebrow">STACK</p>
-      <h2>Technologies used</h2>
-      <div class="tech-grid">
-        <article class="tech-card">
-          <span class="tag tag-green">BACKEND</span>
-          <h3>Python 3.11</h3>
-          <p>Evolution loop, genome, fitness</p>
+    <!-- ALGORITHM -->
+    <section id="algorithm" class="section">
+      <p class="eyebrow">Under the hood</p>
+      <h2>How the genetic algorithm works</h2>
+      <p class="section-desc">Four ideas turn random wiggling into a deliberate gait.</p>
+      <div class="algo-grid">
+        <article class="algo-card">
+          <h3>Selection pressure</h3>
+          <p>Each generation, parents are chosen by <b>tournament selection</b>: pick five creatures at random, keep the fittest. The best three genomes also survive untouched (<b>elitism</b>), so progress is never lost.</p>
         </article>
-        <article class="tech-card">
-          <span class="tag tag-blue">SIMULATION</span>
-          <h3>PyBullet</h3>
-          <p>Rigid body physics DIRECT mode</p>
+        <article class="algo-card">
+          <h3>Crossover</h3>
+          <p>Two parents are recombined with <b>uniform crossover</b> — each gene is inherited from one parent or the other. Good "half-solutions" from different lineages get a chance to combine.</p>
         </article>
-        <article class="tech-card">
-          <span class="tag tag-green">BACKEND</span>
-          <h3>NumPy</h3>
-          <p>Transforms, genome arrays</p>
+        <article class="algo-card">
+          <h3>Mutation that anneals</h3>
+          <p>Genes receive small <b>Gaussian nudges</b>. Mutation strength starts large to explore, then shrinks each generation to fine-tune — so improvements are gradual, not random jumps.</p>
         </article>
-        <article class="tech-card">
-          <span class="tag tag-purple">FRONTEND</span>
-          <h3>Three.js</h3>
-          <p>WebGL replay renders</p>
+        <article class="algo-card">
+          <h3>A meaningful fitness</h3>
+          <p>Fitness rewards <b>rightward distance</b> only, minus an energy cost, and is frozen the instant a creature flips airborne. Spinning, drifting, and hopping exploits all score zero — walking wins.</p>
         </article>
-        <article class="tech-card">
-          <span class="tag tag-purple">FRONTEND</span>
-          <h3>Vanilla JS</h3>
-          <p>No framework, static host</p>
-        </article>
-        <article class="tech-card">
-          <span class="tag tag-green">ALGORITHM</span>
-          <h3>Genetic algo</h3>
-          <p>Mutation-only, population-based</p>
-        </article>
+      </div>
+      <div class="formula">
+        <span class="formula-label">Fitness</span>
+        <code>fitness = max(0, forward_distance &minus; 0.015 &middot; energy &minus; launch_penalty)</code>
       </div>
     </section>
 
-    <!-- DEMO SECTION -->
+    <!-- DEMO -->
     <section id="demo" class="section demo-section">
-      <p class="eyebrow">DEMO</p>
-      <h2>Replay viewer</h2>
-      <p class="section-desc" style="max-width: 600px;">
-        Watch exported replays from the evolution run. Select a generation to compare how locomotion strategies improve over time.
-      </p>
-      
-      <div class="demo-select-container">
-        <select id="generation-select" class="dropdown">
-          <option value="gen_0.json">Generation 0 &mdash; random starting point</option>
-          <option value="gen_10.json">Generation 10</option>
-          <option value="gen_20.json">Generation 20</option>
-          <option value="gen_30.json">Generation 30</option>
-          <option value="gen_40.json">Generation 40</option>
-          <option value="gen_50.json">Generation 50</option>
-          <option value="gen_60.json">Generation 60</option>
-          <option value="gen_70.json">Generation 70</option>
-          <option value="gen_80.json">Generation 80</option>
-          <option value="gen_90.json">Generation 90</option>
-          <option value="gen_100.json" selected>Generation 100 &mdash; best evolved</option>
-        </select>
-      </div>
+      <p class="eyebrow">Live demo</p>
+      <h2>Watch evolution happen</h2>
+      <p class="section-desc">Step through the generations and watch the same body plan learn to crawl. Everything you see is real recorded physics.</p>
 
-      <div class="player-container">
-        <div class="player-header">
-          <div class="player-title">Loading...</div>
-        </div>
-        
-        <div class="replay-stage" id="viewer-container">
-          <div class="placeholder-overlay" id="loading-overlay">
-            <p>Loading 3D Viewer...</p>
+      <div class="demo-layout">
+        <div class="demo-main">
+          <div class="player-container">
+            <div class="player-header">
+              <span class="player-title" id="player-title">Loading…</span>
+              <span class="player-badge" id="player-badge"></span>
+            </div>
+            <div class="replay-stage" id="viewer-container">
+              <div class="placeholder-overlay" id="loading-overlay"><div class="spinner"></div><p>Loading 3D viewer…</p></div>
+            </div>
+            <div class="player-controls">
+              <div class="control-btns">
+                <button id="btn-reset" class="icon-btn" title="Restart">&#9198;</button>
+                <button id="btn-play-pause" class="icon-btn play-btn">&#9654;&nbsp;Play</button>
+                <button id="btn-speed" class="icon-btn" title="Playback speed">1&times;</button>
+              </div>
+              <input type="range" id="playback-scrubber" min="0" max="100" value="0">
+              <span class="time-display"><span id="frame-time">0.0</span>s</span>
+            </div>
+          </div>
+
+          <div class="gen-selector">
+            <label for="generation-select">Generation</label>
+            <select id="generation-select" class="dropdown"></select>
+            <div class="gen-slider-wrap">
+              <input type="range" id="generation-slider" min="0" max="0" value="0" step="1">
+            </div>
           </div>
         </div>
-        
-        <div class="player-controls">
-          <div class="control-btns">
-            <button id="btn-reset" class="icon-btn" title="Reset to frame 0">&#9198;</button>
-            <button id="btn-play-pause" class="icon-btn play-btn">&#9654; Play</button>
+
+        <aside class="demo-side">
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3>Fitness over generations</h3>
+              <div class="chart-legend">
+                <span class="lg lg-best">Best</span>
+                <span class="lg lg-avg">Average</span>
+              </div>
+            </div>
+            <canvas id="evolution-chart" width="480" height="240"></canvas>
           </div>
-          <div class="scrubber-wrapper">
-            <input type="range" id="playback-scrubber" min="0" max="100" value="0">
-          </div>
-          <div class="time-display">
-            <span id="demo-frame-count">0</span> frames
-          </div>
-          <div class="speed-control">
-            <button id="btn-speed" class="icon-btn speed-btn" title="Toggle playback speed">0.5x</button>
-          </div>
-        </div>
+        </aside>
       </div>
 
       <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-value">&mdash;</div>
-          <div class="stat-label">Generation</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value">&mdash;</div>
-          <div class="stat-label">Fitness (distance)</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value">&mdash;</div>
-          <div class="stat-label">Population size</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value">&mdash;</div>
-          <div class="stat-label">Body parts</div>
-        </div>
+        <div class="stat-box"><div class="stat-value" id="s-gen">—</div><div class="stat-label">Generation</div></div>
+        <div class="stat-box"><div class="stat-value" id="s-best">—</div><div class="stat-label">Best fitness</div></div>
+        <div class="stat-box"><div class="stat-value" id="s-avg">—</div><div class="stat-label">Avg fitness</div></div>
+        <div class="stat-box"><div class="stat-value" id="s-dist">—</div><div class="stat-label">Distance travelled</div></div>
+        <div class="stat-box"><div class="stat-value" id="s-forward">—</div><div class="stat-label">Forward movers</div></div>
+        <div class="stat-box"><div class="stat-value" id="s-mut">—</div><div class="stat-label">Mutation rate</div></div>
+        <div class="stat-box"><div class="stat-value" id="s-freq">—</div><div class="stat-label">Gait frequency</div></div>
+        <div class="stat-box"><div class="stat-value" id="s-pop">—</div><div class="stat-label">Population</div></div>
+      </div>
+    </section>
+
+    <!-- TECH -->
+    <section id="tech" class="section">
+      <p class="eyebrow">Stack</p>
+      <h2>Technologies used</h2>
+      <div class="tech-grid">
+        <article class="tech-card"><span class="tag tag-green">Backend</span><h3>Python 3</h3><p>Evolution loop, genome, fitness</p></article>
+        <article class="tech-card"><span class="tag tag-blue">Physics</span><h3>pymunk</h3><p>Chipmunk2D rigid-body engine</p></article>
+        <article class="tech-card"><span class="tag tag-green">Compute</span><h3>NumPy</h3><p>Vectorised gene operators</p></article>
+        <article class="tech-card"><span class="tag tag-purple">Frontend</span><h3>Three.js</h3><p>WebGL replay rendering</p></article>
+        <article class="tech-card"><span class="tag tag-purple">Frontend</span><h3>Vanilla JS</h3><p>No framework, static hosting</p></article>
+        <article class="tech-card"><span class="tag tag-amber">Method</span><h3>Genetic algorithm</h3><p>Tournament, crossover, elitism</p></article>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="footer-left">Built with Python &bull; PyBullet &bull; Three.js</div>
+    <div class="footer-left">Built with Python &bull; pymunk &bull; Three.js</div>
     <div class="footer-right">
-      <a href="#">GitHub &#8599;</a>
-      <a href="#">Technical log &#8599;</a>
+      <a href="https://github.com/AnshadityaSharma/evocreatures" target="_blank" rel="noopener">GitHub &#8599;</a>
+      <a href="#about">About</a>
     </div>
   </footer>
 
